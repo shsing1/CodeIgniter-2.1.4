@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Admin extends CI_Controller {
+class Admin extends Admin_Controller {
 
     /**
      * Index Page for this controller.
@@ -19,8 +19,13 @@ class Admin extends CI_Controller {
      */
     public function index()
     {
-        echo 'index';
-        $this->load->view('admin_message');
+        $this->template->render('layout');
+    }
+
+    public function list_elm(){
+        //print_r($_SERVER['HTTP_ACCEPT']);
+        $data['json_data'] = array('foo' => 'bar');
+        $this->load->view('template/json', $data);
     }
 
     /**
@@ -29,7 +34,7 @@ class Admin extends CI_Controller {
     public function add()
     {
         echo 'add';
-        $this->load->view('admin_message');
+        $this->template->render('admin_message');
     }
 }
 /* End of file welcome.php */

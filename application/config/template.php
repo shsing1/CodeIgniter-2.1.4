@@ -10,6 +10,8 @@ $config['template_layout'] = 'template/layout';
  * default css
  */
 $config['template_css'] = array(
+    'http://yui.yahooapis.com/3.5.0/build/cssreset/cssreset-min.css' => 'screen',
+    'http://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css' => 'screen'
     // '/assets/css/index.css' => 'screen'
 );
 
