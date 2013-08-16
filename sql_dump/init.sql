@@ -25,3 +25,22 @@ CREATE TABLE IF NOT EXISTS `ci_meta_entity` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- 表的結構 `ci_meta_property`
+--
+
+CREATE TABLE IF NOT EXISTS `ci_meta_property` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned NOT NULL,
+  `name` varchar(30) NOT NULL,
+  `column_name` varchar(50) NOT NULL,
+  `nullable` tinyint(1) NOT NULL,
+  `updatable` tinyint(1) NOT NULL,
+  `multilingual` tinyint(1) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

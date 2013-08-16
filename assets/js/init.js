@@ -55,7 +55,7 @@ $(function () {
      * 資料載入後處理後續動作
      * @param  {[type]} data   [description]
      */
-    function loadComplete(data) {
+    function loadComplete() {
         $("#jqGrid-table").find('a:not([href^=http])').address();
     }
 
@@ -76,7 +76,12 @@ $(function () {
         div.appendTo('#east');
         options.loadComplete = loadComplete;
         div.find("#jqGrid-table").jqGrid(options);
-        div.find("#jqGrid-table").jqGrid('navGrid', '#jqGrid-pager');
+        div.find("#jqGrid-table").jqGrid('navGrid', '#jqGrid-pager',
+                {}, // navGrid options
+                { editData: options.postData }, // add options
+                { editData: options.postData }, // edit options
+                { delData: options.postData }  // del options
+            );
         // div.find("#jqGrid-table").jqGrid('navGrid', '#jqGrid-pager', {edit : false, add : false, del : false});
     };
     function ajax_handler(rs) {
@@ -102,6 +107,7 @@ $(function () {
             // Loads the page content and inserts it into the content area
             $.ajax({
                 url: site_root + event.path,
+                data : event.parameters,
                 success: function(data) {
                     ajax_handler(data);
                 }

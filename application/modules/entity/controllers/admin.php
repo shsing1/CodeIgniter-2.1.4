@@ -73,7 +73,7 @@ class Admin extends Admin_Controller {
                 '{"name" : "id", "index" : "id", "width" : 55, "editable" : false, "sorttype" : "int"},'.
                 '{"name" : "name", "index" : "name", "width" : 90, "editable" : true, "editrules" : {"required" : true}},'.
                 '{"name" : "class_name", "index" : "class_name", "width" : 90, "editable" : true, "editrules" : {"required" : true}},'.
-                '{"name" : "table_name", "index" : "table_name", "width" : 90, "editable" : true, "editrules" : {"required" : true}, "formatter" : "showlink", "formatoptions" : {"baseLinkUrl" : "property"}}'.
+                '{"name" : "table_name", "index" : "table_name", "width" : 90, "editable" : true, "editrules" : {"required" : true}, "formatter" : "showlink", "formatoptions" : {"baseLinkUrl" : "property", "idName" : "parent_id"}}'.
             ']';
 
         // $options->colModel = json_decode($colModel);

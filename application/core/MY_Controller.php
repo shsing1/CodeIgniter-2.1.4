@@ -44,7 +44,7 @@ class Admin_Controller extends MY_Controller {
         $limit = (int)$this->input->post('rows');
 
         $records = $this->post->count_by();
-        if ( $records >0 ) {
+        if ( $records > 0 ) {
             $total_pages = ceil($records / $limit);
         } else {
             $total_pages = 0;
@@ -84,6 +84,7 @@ class Admin_Controller extends MY_Controller {
         $options->viewrecords = true;
         $options->sortorder = 'desc';
         $options->caption = 'Entity';
+        // $options->postData = [];
 
         $this->_jqgrid_options = $options;
     }
