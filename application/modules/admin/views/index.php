@@ -7,5 +7,6 @@
 </div>
 <div id="east_wrap">
     <div id="east">east</div>
+    <div class="cb"></div>
 </div>
 <div id="south">south</div>

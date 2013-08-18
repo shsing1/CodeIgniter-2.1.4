@@ -4,9 +4,9 @@ $(function () {
     'use strict';
     var site_root = '/admin',
         my_alert,
-        // win = $(window),
+        win = $(window),
         // content = $('#content'),
-        doc = $(document),
+        // doc = $(document),
         handler_fun = {};
 
     $.ajaxSetup({
@@ -47,9 +47,10 @@ $(function () {
     function set_east_height() {
         var nh = $('#north').height(),
             sh = $('#south').height();
-        $('#west, #east').height(doc.height() - nh - sh);
+        $('#west').height(win.height() - nh - sh);
     }
-    set_east_height();
+    // set_east_height();
+    win.on('resize load', set_east_height);
 
     /**
      * 資料載入後處理後續動作

@@ -1,3 +1,12 @@
+.cb{
+    clear: both;
+}
+#north{
+    height: 50px;
+}
+#south{
+    height: 50px;
+}
 #west{
     float:left;
     width:200px;

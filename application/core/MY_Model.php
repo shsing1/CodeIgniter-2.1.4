@@ -904,3 +904,29 @@ class MY_Model extends CI_Model
         return $this->_temporary_return_type == 'array' ? $method . '_array' : $method;
     }
 }
+
+class CHH_Model extends MY_Model
+{
+    protected $before_create = array('match_fields');
+    protected $before_update = array('match_fields');
+
+    /**
+     * 匹配資料與資料庫欄位
+     * @param  array $data 欲進資料庫資料
+     * @return array       處理後資料
+     */
+    public function match_fields($data)
+    {
+        $new_data = array();
+        foreach($data as $key => $val)
+        {
+            if ($key !== $this->primary_key) {
+                if ($this->db->field_exists($key, $this->_table))
+                {
+                   $new_data[$key] = $val;
+                }
+            }
+        }
+        return $new_data;
+    }
+}
