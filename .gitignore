@@ -215,3 +215,4 @@ pip-log.txt
 .mr.developer.cfg
 
 application/logs/*
+.travis.yml

@@ -17,7 +17,7 @@ class QueryLogHook {
         {
             foreach ($queries as $key=>$query)
             {
-                $output .= $query . "\n";
+                $output .= "===\n" . $query . "\n";
             }
             $took = round(doubleval($times[$key]), 3);
             $output .= "===[took:{$took}]\n\n";

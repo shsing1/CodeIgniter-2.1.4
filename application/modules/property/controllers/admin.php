@@ -25,8 +25,12 @@ class Admin extends Admin_Controller {
         $colModel = '['.
                 '{"name" : "id", "index" : "id", "width" : 55, "editable" : false, "sorttype" : "int"},'.
                 '{"name" : "name", "index" : "name", "width" : 90, "editable" : true, "editrules" : {"required" : true}},'.
-                '{"name" : "class_name", "index" : "class_name", "width" : 90, "editable" : true, "editrules" : {"required" : true}},'.
-                '{"name" : "table_name", "index" : "table_name", "width" : 90, "editable" : true, "editrules" : {"required" : true}, "formatter" : "showlink", "formatoptions" : {"baseLinkUrl" : "property"}}'.
+                '{"name" : "column_name", "index" : "column_name", "width" : 90, "editable" : true, "editrules" : {"required" : true}},'.
+                '{"name" : "type_id", "index" : "type_id", "width" : 50, "editable" : true, "editrules" : {"required" : true}},'.
+                '{"name" : "length", "index" : "length", "width" : 50, "editable" : true, "editrules" : {"required" : false}},'.
+                '{"name" : "nullable", "index" : "nullable", "width" : 100, "editable" : true, "edittype" : "checkbox", "editoptions" : {"value" : "1:0"}},'.
+                '{"name" : "updatable", "index" : "updatable", "width" : 100, "editable" : true, "edittype" : "checkbox", "editoptions" : {"value" : "1:0", "defaultValue" : "1"}},'.
+                '{"name" : "multilingual", "index" : "multilingual", "width" : 100, "editable" : true, "edittype" : "checkbox", "editoptions" : {"value" : "1:0"}}'.
             ']';
 
         $this->_jqgrid_options->colModel = json_decode($colModel);

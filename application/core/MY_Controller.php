@@ -43,7 +43,12 @@ class Admin_Controller extends MY_Controller {
         $page = (int)$this->input->post('page');
         $limit = (int)$this->input->post('rows');
 
-        $records = $this->post->count_by();
+        $this->db->select('count(id) AS records');
+        $rows = $this->post->get_all();
+        $records = 0;
+        foreach($rows as $row){
+            $records = $row->records;
+        }
         if ( $records > 0 ) {
             $total_pages = ceil($records / $limit);
         } else {

@@ -929,4 +929,8 @@ class CHH_Model extends MY_Model
         }
         return $new_data;
     }
+
+    public function select($select = '*', $escape = NULL){
+        $this->db->select($select, $escape);
+    }
 }
