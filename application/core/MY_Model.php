@@ -907,8 +907,12 @@ class MY_Model extends CI_Model
 
 class CHH_Model extends MY_Model
 {
+    protected $soft_delete = TRUE;
+
     protected $before_create = array('match_fields');
     protected $before_update = array('match_fields');
+
+    protected $list_count_childrens = false;
 
     /**
      * 匹配資料與資料庫欄位
@@ -932,5 +936,38 @@ class CHH_Model extends MY_Model
 
     public function select($select = '*', $escape = NULL){
         $this->db->select($select, $escape);
+    }
+
+    public function get_list_count_childrens() {
+        return $this->list_count_childrens;
+    }
+
+    public function get_col_model() {
+        $query  = $this->db->select('*')->from('meta_entity')->join($this->db->dbprefix('meta_property'), ''.$this->db->dbprefix('meta_property').'.parent_id = '.$this->db->dbprefix('meta_entity').'.id')->where('table_name', $this->_table)->get();
+
+        $list = array();
+        foreach ($query->result() as $row)
+        {
+            $col = new stdClass;
+            $col->id = $row->name;
+            $col->name = $row->name;
+            $col->label = $row->name;
+            $col->index = $row->column_name;
+            if (isset($row->width) && $row->width !== null) {
+                $col->width = $row->width;
+            }
+
+            $col->editable = (boolean)$row->editable;
+
+            if ($col->editable) {
+                $editrules = new stdClass;
+                $editrules->required = (boolean)$row->nullable;
+                $col->editrules = $editrules;
+            }
+
+            $list[] = $col;
+        }
+        $this->fb->info($row);
+        return $list;
     }
 }

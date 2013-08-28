@@ -3,7 +3,6 @@
 
 class Property_Model extends CHH_Model {
     protected $_table = 'meta_property';
-    protected $soft_delete = TRUE;
 
     protected $before_get = array('set_parent');
 

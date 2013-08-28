@@ -3,9 +3,8 @@
 
 class Entity_Model extends CHH_Model {
     protected $_table = 'meta_entity';
-    protected $soft_delete = TRUE;
 
-    protected $before_get = array('count_childrens');
+    protected $list_count_childrens = true;
 
     function count_childrens()
     {

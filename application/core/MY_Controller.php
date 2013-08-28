@@ -61,6 +61,9 @@ class Admin_Controller extends MY_Controller {
         if ($start < 0) {
             $start = 0;
         }
+        if ($this->post->get_list_count_childrens()) {
+            $this->post->count_childrens();
+        }
         $this->post->limit($limit, $start);
         $rows = $this->post->get_all();
 
@@ -88,7 +91,7 @@ class Admin_Controller extends MY_Controller {
         $options->sortname = 'id';
         $options->viewrecords = true;
         $options->sortorder = 'desc';
-        $options->caption = 'Entity';
+        $options->caption = ucfirst($this->router->fetch_module());
         // $options->postData = [];
 
         $this->_jqgrid_options = $options;
