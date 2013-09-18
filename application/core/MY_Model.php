@@ -953,21 +953,51 @@ class CHH_Model extends MY_Model
             $col->name = $row->name;
             $col->label = $row->name;
             $col->index = $row->column_name;
-            if (isset($row->width) && $row->width !== null) {
-                $col->width = $row->width;
-            }
+
 
             $col->editable = (boolean)$row->editable;
+
+            $type_id = (int)$row->type_id;
 
             if ($col->editable) {
                 $editrules = new stdClass;
                 $editrules->required = (boolean)$row->nullable;
+
+                // 數字
+                if ($type_id === 1) {
+                    $editrules->integer = true;
+                // 布林
+                } else if ($type_id === 3) {
+                    $col->edittype = 'checkbox';
+                    $col->editoptions = json_decode('{"value" : "1:0"}');
+                // 浮點數
+                } else if ($type_id === 4) {
+                    $editrules->number = true;
+                }
+
                 $col->editrules = $editrules;
+            } else {
+                $col->hidden = true;
+            }
+
+            // 數字
+            if ($type_id === 1) {
+                $col->width = 50;
+            // 布林
+            } else if ($type_id === 3) {
+                $col->width = 50;
+            // 浮點數
+            } else if ($type_id === 4) {
+                $col->width = 50;
+            }
+
+            if (isset($row->width) && $row->width !== null) {
+                $col->width = $row->width;
             }
 
             $list[] = $col;
         }
-        $this->fb->info($row);
+        // $this->fb->info($row);
         return $list;
     }
 }
