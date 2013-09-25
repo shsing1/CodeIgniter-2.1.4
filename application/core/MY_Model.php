@@ -973,6 +973,12 @@ class CHH_Model extends MY_Model
                 // 浮點數
                 } else if ($type_id === 4) {
                     $editrules->number = true;
+                // 網址
+                } else if ($type_id === 6) {
+                    $editrules->url = true;
+                // email
+                } else if ($type_id === 7) {
+                    $editrules->email = true;
                 }
 
                 $col->editrules = $editrules;
@@ -999,5 +1005,10 @@ class CHH_Model extends MY_Model
         }
         // $this->fb->info($row);
         return $list;
+    }
+
+    public function set_soft_delete ($boolean = true)
+    {
+        $this->soft_delete = $boolean;
     }
 }

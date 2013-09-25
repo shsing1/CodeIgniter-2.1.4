@@ -85,13 +85,13 @@ class Admin extends Admin_Controller {
         $data = $this->input->post();
         // $this->fb->info($data);
 
-        if ($data['id'] === '_empty') {
-            unset($data['id'], $data['oper']);
-            $rs = $this->post->insert($data, true);
-        } else {
-            $id = $data['id'];
-            unset($data['id'], $data['oper']);
-            $rs = $this->post->update($id, $data, true);
+        $id = $data['id'];
+        if ($data['oper'] === 'add') {
+            $rs = $this->post->insert($data);
+        } else if ($data['oper'] === 'edit') {
+            $rs = $this->post->update($id, $data);
+        } else if ($data['oper'] === 'del') {
+            $rs = $this->post->delete($id);
         }
 
         $data['json_data'] = $rs;

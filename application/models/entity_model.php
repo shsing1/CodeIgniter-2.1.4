@@ -3,9 +3,12 @@
 
 class Entity_Model extends CHH_Model {
     protected $_table = 'meta_entity';
+    protected $_drop_id = null;
 
     protected $list_count_childrens = true;
     protected $after_create = array('create_table');
+    protected $before_delete = array('set_drop_table');
+    protected $after_delete = array('drop_table');
 
     function count_childrens()
     {
@@ -41,6 +44,38 @@ class Entity_Model extends CHH_Model {
         $this->dbforge->add_field($fields);
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->create_table($info->table_name, TRUE);
+    }
+
+    /**
+     * 設定欲刪除的id
+     * @param int $id [description]
+     */
+    function set_drop_table($id = null)
+    {
+        $this->_drop_id = $id;
+    }
+
+    /**
+     * 自動刪除資料表
+     * @param  boolean $result [description]
+     */
+    function drop_table($result = false)
+    {
+        // if ($result) {
+        //     $this->load->dbforge();
+
+        //     // 先刪除property
+        //     $this->load->model('property_model');
+        //     $this->property_model->set_soft_delete(false);
+        //     $this->property_model->delete_by('parent_id', $this->_drop_id);
+
+
+        //     $this->set_soft_delete(false);
+        //     $info = $this->get($this->_drop_id);
+        //     $this->fb->info($info);
+
+        //     $this->dbforge->drop_table($info->table_name);
+        // }
     }
 }
 ?>
