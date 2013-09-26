@@ -7,12 +7,15 @@ class Property_Model extends CHH_Model {
 
     protected $before_get = array('set_parent');
     protected $after_create = array('add_column');
-    // protected $before_delete = array('set_drop_column');
-    // protected $after_delete = array('drop_column');
+    protected $before_delete = array('set_drop_column');
+    protected $after_delete = array('drop_column');
 
     function set_parent()
     {
-        $this->db->where('parent_id', (int)$this->input->post('parent_id'));
+        $parent_id = (int)$this->input->post('parent_id');
+        if ($parent_id !== 0) {
+            $this->db->where('parent_id', (int)$this->input->post('parent_id'));
+        }
     }
 
     /**
@@ -74,8 +77,19 @@ class Property_Model extends CHH_Model {
             $this->set_soft_delete(false);
             $info = $this->get($this->_drop_id);
 
-            $this->load->model('entity_model');
-            $paretn_info = $this->entity_model->get($info->parent_id);
+            // $this->fb->info($info);
+
+            // 有該筆資料
+            if ($info) {
+                // delete record
+                $this->delete($info->id);
+
+                $this->load->model('entity_model');
+                $paretn_info = $this->entity_model->get($info->parent_id);
+
+                // drop column
+                $this->dbforge->drop_column($paretn_info->table_name, $info->column_name);
+            }
         }
     }
 }

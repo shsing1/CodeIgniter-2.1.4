@@ -53,6 +53,8 @@ class Entity_Model extends CHH_Model {
     function set_drop_table($id = null)
     {
         $this->_drop_id = $id;
+
+        return $id;
     }
 
     /**
@@ -61,21 +63,31 @@ class Entity_Model extends CHH_Model {
      */
     function drop_table($result = false)
     {
-        // if ($result) {
-        //     $this->load->dbforge();
+        if ($result) {
+            $this->load->dbforge();
 
-        //     // 先刪除property
-        //     $this->load->model('property_model');
-        //     $this->property_model->set_soft_delete(false);
-        //     $this->property_model->delete_by('parent_id', $this->_drop_id);
+            $this->set_soft_delete(false);
+            $info = $this->get($this->_drop_id);
+            $this->fb->info($info);
 
+            if ($info)
+            {
+                // delete record
+                $this->delete($info->id);
 
-        //     $this->set_soft_delete(false);
-        //     $info = $this->get($this->_drop_id);
-        //     $this->fb->info($info);
+                // drop table
+                $this->dbforge->drop_table($info->table_name);
 
-        //     $this->dbforge->drop_table($info->table_name);
-        // }
+                // delete property
+                $this->load->model('property_model');
+                $this->property_model->set_soft_delete(false);
+                $property_list = $this->property_model->get_many_by('parent_id', $this->_drop_id);
+                foreach ($property_list as $v)
+                {
+                    $this->property_model->delete($v->id);
+                }
+            }
+        }
     }
 }
 ?>

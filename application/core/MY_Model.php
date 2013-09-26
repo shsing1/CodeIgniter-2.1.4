@@ -942,11 +942,23 @@ class CHH_Model extends MY_Model
         return $this->list_count_childrens;
     }
 
-    public function get_col_model() {
+    public function get_property_list()
+    {
         $query  = $this->db->select('*')->from('meta_entity')->join($this->db->dbprefix('meta_property'), ''.$this->db->dbprefix('meta_property').'.parent_id = '.$this->db->dbprefix('meta_entity').'.id')->where('table_name', $this->_table)->get();
 
         $list = array();
         foreach ($query->result() as $row)
+        {
+            $list[] = $row;
+        }
+
+        return $list;
+    }
+    public function get_col_model() {
+        $property_list = $this->get_property_list();
+
+        $list = array();
+        foreach ($property_list as $row)
         {
             $col = new stdClass;
             $col->id = $row->name;
@@ -1010,5 +1022,57 @@ class CHH_Model extends MY_Model
     public function set_soft_delete ($boolean = true)
     {
         $this->soft_delete = $boolean;
+    }
+}
+
+class CHH_TREE_Model extends CHH_Model
+{
+    protected $before_get = array('ignored_root');
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $count_all = $this->count_all();
+
+        // 新增root節點
+        if ($count_all === 0)
+        {
+            $property_list = $this->get_property_list();
+
+            $data = array(
+                    'lft' => 1,
+                    'rgt' => 2
+                );
+            foreach ($property_list as $v)
+            {
+                if ($v->column_name === 'name')
+                {
+                    if ((boolean)$v->multilingual === true)
+                    {
+                        $this->load->model('language_model');
+                        $language_list = $this->language_model->get_all();
+                        foreach ($language_list as $v2) {
+                            $data[$v->column_name . '__' . $v2->id] = 'ROOT';
+                        }
+                    } else
+                    {
+                        $data[$v->column_name] = '';
+                    }
+                }
+            }
+            $this->fb->info($property_list);
+            // $data = array(
+            //         'name' => 'ROOT',
+            //         'lft' => 1,
+            //         'rgt' => 2
+            //     );
+            $this->insert($data);
+        }
+    }
+
+    public function ignored_root()
+    {
+        $this->db->where('id !=', 1);
     }
 }

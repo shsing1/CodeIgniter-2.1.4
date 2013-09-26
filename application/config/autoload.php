@@ -52,7 +52,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('database', 'firephp', 'fb');
+$autoload['libraries'] = array('database', 'session', 'firephp', 'fb');
 
 
 /*

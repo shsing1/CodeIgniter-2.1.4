@@ -11,6 +11,55 @@ class MY_Controller extends CI_Controller {
         if(preg_match('/application\/json/i', $_SERVER['HTTP_ACCEPT'])){
             $this->output->set_content_type('application/json');
         }
+
+        // set current language
+        $this->get_current_language();
+    }
+
+    /**
+     * 取得當前語系資料
+     * @return object
+     */
+    function get_current_language()
+    {
+        if (!$this->session->userdata('current_language'))
+        {
+            $this->load->library('user_agent');
+            $this->load->model('language_model');
+
+            $language_list = $this->language_model->get_all();
+
+            $set_language = false;
+            // 比對瀏覽器語系
+            foreach ($language_list as $key => $value)
+            {
+                if ($this->agent->accept_lang($value->browser))
+                {
+                    $newdata = array(
+                           'current_language' => $value
+                        );
+                    $this->session->set_userdata($newdata);
+                    $set_language = true;
+                    break;
+                }
+            }
+
+            // 比對失敗走預設
+            if (!$set_language)
+            {
+                foreach ($language_list as $key => $value)
+                {
+                    $newdata = array(
+                           'current_language' => $value
+                        );
+                    $this->session->set_userdata($newdata);
+                    $set_language = true;
+                    break;
+                }
+            }
+            // $this->fb->info($this->agent->accept_lang('zh-tw'));
+        }
+        // $this->fb->info($this->session->userdata('current_language'));
     }
 }
 class Admin_Controller extends MY_Controller {
