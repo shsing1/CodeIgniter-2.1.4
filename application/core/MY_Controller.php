@@ -22,6 +22,7 @@ class MY_Controller extends CI_Controller {
      */
     function get_current_language()
     {
+        // $this->session->unset_userdata('current_language');
         if (!$this->session->userdata('current_language'))
         {
             $this->load->library('user_agent');
@@ -70,7 +71,7 @@ class Admin_Controller extends MY_Controller {
     {
         parent::__construct();
         $this->template->add_js('/assets/js/jquery.address-1.6.min.js', TRUE);
-        $this->template->add_js('/assets/js/i18n/grid.locale-en.js', TRUE);
+        $this->template->add_js('/assets/js/i18n/grid.locale-'.$this->session->userdata('current_language')->jqgrid.'.js', TRUE);
         $this->template->add_js('/assets/js/jquery.jqGrid.min.js', TRUE);
         $this->template->add_js('/assets/js/init.js', TRUE);
 
@@ -142,6 +143,7 @@ class Admin_Controller extends MY_Controller {
         $options->sortorder = 'desc';
         $options->caption = ucfirst($this->router->fetch_module());
         // $options->postData = [];
+        $options->height = '100%';
 
         $this->_jqgrid_options = $options;
     }

@@ -50,14 +50,22 @@ $(function () {
         $('#west').height(win.height() - nh - sh);
     }
     // set_east_height();
-    win.on('resize load', set_east_height);
 
+
+    /**
+     * 設定grid寬度
+     */
+    function set_grid_width() {
+        var ew = $('#east').width();
+        $("#jqGrid-table").jqGrid('setGridWidth', ew - 10);
+    }
     /**
      * 資料載入後處理後續動作
      * @param  {[type]} data   [description]
      */
     function loadComplete() {
         $("#jqGrid-table").find('a:not([href^=http])').address();
+        set_grid_width();
     }
 
     /**
@@ -76,6 +84,7 @@ $(function () {
         div = $(html);
         div.appendTo('#east');
         options.loadComplete = loadComplete;
+        options.gridComplete = set_grid_width;
         div.find("#jqGrid-table").jqGrid(options);
         div.find("#jqGrid-table").jqGrid('navGrid', '#jqGrid-pager',
                 {}, // navGrid options
@@ -116,4 +125,9 @@ $(function () {
         });
     }
     set_address_link();
+
+    win.on('resize load', function () {
+        set_east_height();
+        set_grid_width();
+    });
 });

@@ -971,49 +971,75 @@ class CHH_Model extends MY_Model
 
             $type_id = (int)$row->type_id;
 
+            $col->editrules = new stdClass;
+            // 可以編輯
             if ($col->editable) {
-                $editrules = new stdClass;
-                $editrules->required = (boolean)$row->nullable;
+                // $editrules = new stdClass;
+                $col->editrules->required = (boolean)$row->nullable;
 
                 // 數字
                 if ($type_id === 1) {
-                    $editrules->integer = true;
+                    $col->editrules->integer = true;
                 // 布林
                 } else if ($type_id === 3) {
                     $col->edittype = 'checkbox';
                     $col->editoptions = json_decode('{"value" : "1:0"}');
                 // 浮點數
                 } else if ($type_id === 4) {
-                    $editrules->number = true;
+                    $col->editrules->number = true;
                 // 網址
                 } else if ($type_id === 6) {
-                    $editrules->url = true;
+                    $col->editrules->url = true;
                 // email
                 } else if ($type_id === 7) {
-                    $editrules->email = true;
+                    $col->editrules->email = true;
                 }
 
-                $col->editrules = $editrules;
+                // $col->editrules = $editrules;
             } else {
                 $col->hidden = true;
             }
 
-            // 數字
-            if ($type_id === 1) {
-                $col->width = 50;
-            // 布林
-            } else if ($type_id === 3) {
-                $col->width = 50;
-            // 浮點數
-            } else if ($type_id === 4) {
-                $col->width = 50;
+            // // 數字
+            // if ($type_id === 1) {
+            //     $col->width = 50;
+            // // 布林
+            // } else if ($type_id === 3) {
+            //     $col->width = 50;
+            // // 浮點數
+            // } else if ($type_id === 4) {
+            //     $col->width = 50;
+            // }
+
+            // if (isset($row->width) && $row->width !== null) {
+            //     $col->width = $row->width;
+            // }
+
+            // 多語系欄位
+            if ((boolean)$row->multilingual) {
+                $this->load->model('language_model');
+                $language_list = $this->language_model->get_all();
+                foreach ($language_list as $v2) {
+                    $col2 = json_decode(json_encode($col));
+
+                    $col2->name = $row->column_name. '__' . $v2->id;
+                    $col2->label = $row->column_name. '(' . $v2->name . ')';
+                    $col2->index = $row->column_name. '__' . $v2->id;
+
+                    // 等於當前語系
+                    if ($v2->id === $this->session->userdata('current_language')->id) {
+                        $col2->hidden = false;
+                    } else {
+                        $col2->hidden = true;
+                        $col2->editrules->edithidden = true;
+
+                    }
+                    $list[] = $col2;
+                }
+            } else {
+                 $list[] = $col;
             }
 
-            if (isset($row->width) && $row->width !== null) {
-                $col->width = $row->width;
-            }
-
-            $list[] = $col;
         }
         // $this->fb->info($row);
         return $list;
@@ -1071,8 +1097,64 @@ class CHH_TREE_Model extends CHH_Model
         }
     }
 
+    /**
+     * 排除root節點
+     * @return [type] [description]
+     */
     public function ignored_root()
     {
         $this->db->where('id !=', 1);
+    }
+
+    /**
+     * 新增多層分類節點
+     * @param  array   $data            [description]
+     * @param  boolean $skip_validation [description]
+     * @return intege                   [description]
+     */
+    public function insert($data, $skip_validation = FALSE)
+    {
+        if ($skip_validation === FALSE)
+        {
+            $data = $this->validate($data);
+        }
+
+        if ($data !== FALSE)
+        {
+            $data = $this->trigger('before_create', $data);
+
+            $parent_id = $this->input->post('parent_id');
+            if (!$parent_id) {
+                $parent_id = 1;
+            }
+
+            // 取得父節點
+            $this->before_get = array();
+            $parent_info = $this->db->get($parent_id);
+
+            // 鎖住資料表
+            $this->db->query('LOCK TABLE '.$this->db->dbprefix($this->_table).' WRITE;');
+
+
+            // 空出位置
+            $this->db->query('UPDATE '.$this->db->dbprefix($this->_table).' SET rgt = rgt + 2 WHERE rgt > ?;', $parent_info->lft);
+            $this->db->query('UPDATE '.$this->db->dbprefix($this->_table).' SET lft = lft + 2 WHERE lft > ?;', $parent_info->lft);
+
+            // 新增資料
+            $this->_database->insert($this->_table, $data);
+            $insert_id = $this->_database->insert_id();
+
+            // 解鎖
+            $this->db->query('UNLOCK TABLES;');
+
+
+            $this->trigger('after_create', $insert_id);
+
+            return $insert_id;
+        }
+        else
+        {
+            return FALSE;
+        }
     }
 }
