@@ -1053,7 +1053,10 @@ class CHH_Model extends MY_Model
 
 class CHH_TREE_Model extends CHH_Model
 {
-    protected $before_get = array('ignored_root');
+    protected $before_get = array('ignored_root', 'set_order_by');
+    protected $order_by = array(
+                                array('lft', 'ASC')
+                            );
 
     public function __construct()
     {
@@ -1106,6 +1109,14 @@ class CHH_TREE_Model extends CHH_Model
         $this->db->where('id !=', 1);
     }
 
+    public function set_order_by()
+    {
+        foreach($this->order_by as $v)
+        {
+            $this->db->order_by($v[0], $v[1]);
+        }
+    }
+
     /**
      * 新增多層分類節點
      * @param  array   $data            [description]
@@ -1130,7 +1141,8 @@ class CHH_TREE_Model extends CHH_Model
 
             // 取得父節點
             $this->before_get = array();
-            $parent_info = $this->db->get($parent_id);
+            $parent_info = $this->get($parent_id);
+            $this->fb->info($parent_info);
 
             // 鎖住資料表
             $this->db->query('LOCK TABLE '.$this->db->dbprefix($this->_table).' WRITE;');
@@ -1140,9 +1152,13 @@ class CHH_TREE_Model extends CHH_Model
             $this->db->query('UPDATE '.$this->db->dbprefix($this->_table).' SET rgt = rgt + 2 WHERE rgt > ?;', $parent_info->lft);
             $this->db->query('UPDATE '.$this->db->dbprefix($this->_table).' SET lft = lft + 2 WHERE lft > ?;', $parent_info->lft);
 
+            $this->fb->info($data);
+            $data['lft'] = (int)$parent_info->lft + 1;
+            $data['rgt'] = (int)$parent_info->lft + 2;
             // 新增資料
             $this->_database->insert($this->_table, $data);
             $insert_id = $this->_database->insert_id();
+            $this->fb->info($data);
 
             // 解鎖
             $this->db->query('UNLOCK TABLES;');
