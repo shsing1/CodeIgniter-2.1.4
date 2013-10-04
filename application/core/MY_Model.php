@@ -975,7 +975,7 @@ class CHH_Model extends MY_Model
             // 可以編輯
             if ($col->editable) {
                 // $editrules = new stdClass;
-                $col->editrules->required = (boolean)$row->nullable;
+                $col->editrules->required = !(boolean)$row->nullable;
 
                 // 數字
                 if ($type_id === 1) {
@@ -1058,6 +1058,8 @@ class CHH_TREE_Model extends CHH_Model
                                 array('lft', 'ASC')
                             );
 
+    protected $list_count_childrens = true;
+
     public function __construct()
     {
         parent::__construct();
@@ -1099,6 +1101,14 @@ class CHH_TREE_Model extends CHH_Model
             $this->insert($data);
         }
     }
+
+    function count_childrens()
+    {
+        $this->load->model('property_model');
+
+        $this->select("*, get_childrens_count(`id`) AS `childrens`");
+    }
+
 
     /**
      * 排除root節點

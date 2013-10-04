@@ -21,6 +21,7 @@ class Admin extends Admin_Controller {
     {
         $this->load->model($this->router->fetch_module() . '_model', 'post');
         $colModel = $this->post->get_col_model();
+        $colModel[] = json_decode('{"name" : "childrens", "index" : "childrens", "width" : 50, "editable" : false, "formatter" : "showlink", "formatoptions" : {"baseLinkUrl" : "backend_menu", "idName" : "parent_id"}}');
         // $this->fb->info($colModel );
         // $colModel = '['.
         //         '{"name" : "id", "index" : "id", "width" : 55, "editable" : false, "sorttype" : "int"},'.
