@@ -65,7 +65,9 @@ class Admin extends Admin_Controller {
     public function list_data()
     {
 
-        $info = $this->get_page_info();
+        $this->load->model($this->router->fetch_module() . '_model', 'post');
+
+        $info = $this->post->get_page_info();
         // $this->fb->info($info);
 
         $rs = new stdClass;

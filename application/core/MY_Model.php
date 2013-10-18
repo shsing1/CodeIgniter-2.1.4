@@ -1049,16 +1049,60 @@ class CHH_Model extends MY_Model
     {
         $this->soft_delete = $boolean;
     }
+
+    /**
+     * 取得頁碼資訊
+     * @param  array $list 全部資料數
+     * @return object
+     */
+    function get_page_info() {
+
+        // $this->load->model($this->router->fetch_module() . '_model', 'post');
+
+        $page = (int)$this->input->post('page');
+        $limit = (int)$this->input->post('rows');
+
+        $this->db->select('count(id) AS records');
+        $rows = $this->get_all();
+        $records = 0;
+        foreach($rows as $row){
+            $records = $row->records;
+        }
+        if ( $records > 0 ) {
+            $total_pages = ceil($records / $limit);
+        } else {
+            $total_pages = 0;
+        }
+        if ($page > $total_pages) {
+            $page = $total_pages;
+        }
+        $start = $limit * $page - $limit;
+        if ($start < 0) {
+            $start = 0;
+        }
+        if ($this->get_list_count_childrens()) {
+            $this->count_childrens();
+        }
+        $this->limit($limit, $start);
+        $rows = $this->get_all();
+
+        $info = new stdClass;
+
+        $info->page = $page;
+        $info->total = $total_pages;
+        $info->records = $records;
+        $info->rows = $rows;
+
+        return $info;
+    }
 }
 
 class CHH_TREE_Model extends CHH_Model
 {
-    protected $before_get = array('ignored_root', 'set_order_by');
+    protected $before_get = array('ignored_root', 'set_parent', 'set_order_by');
     protected $order_by = array(
                                 array('lft', 'ASC')
                             );
-
-    protected $list_count_childrens = true;
 
     public function __construct()
     {
@@ -1102,11 +1146,58 @@ class CHH_TREE_Model extends CHH_Model
         }
     }
 
-    function count_childrens()
-    {
-        $this->load->model('property_model');
+    /**
+     * 取得頁碼資訊
+     * @param  array $list 全部資料數
+     * @return object
+     */
+    function get_page_info() {
+        $info = parent::get_page_info();
 
-        $this->select("*, get_childrens_count(`id`) AS `childrens`");
+        $rows = $info->rows;
+
+        foreach ($rows as $row) {
+            $row->childrens = $this->get_childrens_count($row->id);
+        }
+
+        $info->rows = $rows;
+
+        return $info;
+    }
+
+    function get_childrens_count($id = null)
+    {
+        $sql = "SELECT COUNT(*) AS count
+                  FROM (SELECT node.id,
+                              (COUNT(parent.id) - (sub_tree.depth + 1)) AS depth
+                         FROM ".$this->db->dbprefix($this->_table)." AS node,
+                              ".$this->db->dbprefix($this->_table)." AS parent,
+                              ".$this->db->dbprefix($this->_table)." AS sub_parent,
+                              ( SELECT node.id,
+                                       (COUNT(parent.id) - 1) AS depth
+                                  FROM ".$this->db->dbprefix($this->_table)." AS node,
+                                       ".$this->db->dbprefix($this->_table)." AS parent
+                                 WHERE node.lft BETWEEN parent.lft AND parent.rgt
+                                   AND node.id = " . $id . "
+                              GROUP BY node.id
+                              ORDER BY node.lft
+                              ) AS sub_tree
+                        WHERE node.lft BETWEEN parent.lft AND parent.rgt
+                          AND node.lft BETWEEN sub_parent.lft AND sub_parent.rgt
+                          AND sub_parent.id = sub_tree.id
+                     GROUP BY node.id
+                       HAVING depth = 1
+                     ORDER BY node.lft
+                  ) AS `childrens`";
+
+        $query = $this->db->query($sql);
+
+        $count = 0;
+        foreach ($query->result() as $row)
+        {
+            $count = $row->count;
+        }
+        return $count;
     }
 
 
@@ -1117,6 +1208,21 @@ class CHH_TREE_Model extends CHH_Model
     public function ignored_root()
     {
         $this->db->where('id !=', 1);
+    }
+
+    function set_parent()
+    {
+        $parent_id = (int)$this->input->post('parent_id');
+        $level = 1;
+        $this->fb->info($parent_id);
+        if ($parent_id !== 0) {
+            // 取得父節點的info
+            $parent_info = $this->post->get($parent_id);
+            if ($parent_info) {
+                $level = $parent_info->level + 1;
+            }
+        }
+        // $this->db->where('level', $level);
     }
 
     public function set_order_by()

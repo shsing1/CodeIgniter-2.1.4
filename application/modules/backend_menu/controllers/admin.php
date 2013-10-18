@@ -35,6 +35,11 @@ class Admin extends Admin_Controller {
         // $this->_jqgrid_options->colModel = json_decode($colModel);
         $this->_jqgrid_options->colModel = $colModel;
 
+        // $this->fb->info($this->input->post());
+        if ($this->input->post()) {
+            $this->_jqgrid_options->postData = $this->input->post();
+        }
+
         $rs = new stdClass;
         $rs->fun = 'jqrid';
         $rs->options = $this->_jqgrid_options;
@@ -44,8 +49,9 @@ class Admin extends Admin_Controller {
 
     public function list_data()
     {
+        $this->load->model($this->router->fetch_module() . '_model', 'post');
 
-        $info = $this->get_page_info();
+        $info = $this->post->get_page_info();
 
         $rs = new stdClass;
         $data['json_data'] = $info;
@@ -61,7 +67,24 @@ class Admin extends Admin_Controller {
 
         $this->load->model($this->router->fetch_module() . '_model', 'post');
 
+        // 預設parent_id = 1
+        $parent_id = (int)$this->input->post('parent_id');
+        $level = 1;
+        if ($parent_id !== 0) {
+            // 取得父節點的info
+            $parent_info = $this->post->get($parent_id);
+            if ($parent_info) {
+                $level = $parent_info->level + 1;
+            }
+            // $this->fb->info($parent_info);
+            // $this->fb->info($parent_id);
+        }
+
+
+
+
         $data = $this->input->post();
+        $data['level'] = $level;
 
         $id = $data['id'];
         if ($data['oper'] === 'add') {

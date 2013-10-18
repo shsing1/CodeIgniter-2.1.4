@@ -81,51 +81,7 @@ class Admin_Controller extends MY_Controller {
         $this->set_jqgrid_options();
     }
 
-    /**
-     * 取得頁碼資訊
-     * @param  array $list 全部資料數
-     * @return object
-     */
-    function get_page_info() {
 
-        $this->load->model($this->router->fetch_module() . '_model', 'post');
-
-        $page = (int)$this->input->post('page');
-        $limit = (int)$this->input->post('rows');
-
-        $this->db->select('count(id) AS records');
-        $rows = $this->post->get_all();
-        $records = 0;
-        foreach($rows as $row){
-            $records = $row->records;
-        }
-        if ( $records > 0 ) {
-            $total_pages = ceil($records / $limit);
-        } else {
-            $total_pages = 0;
-        }
-        if ($page > $total_pages) {
-            $page = $total_pages;
-        }
-        $start = $limit * $page - $limit;
-        if ($start < 0) {
-            $start = 0;
-        }
-        if ($this->post->get_list_count_childrens()) {
-            $this->post->count_childrens();
-        }
-        $this->post->limit($limit, $start);
-        $rows = $this->post->get_all();
-
-        $info = new stdClass;
-
-        $info->page = $page;
-        $info->total = $total_pages;
-        $info->records = $records;
-        $info->rows = $rows;
-
-        return $info;
-    }
 
     function set_jqgrid_options() {
 
